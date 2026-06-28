@@ -11,7 +11,7 @@
 ## Status Summary
 <!-- One or two sentences describing where the project stands right now -->
 
-_Full project review completed. `overview.md` and `llm-integration.md` are complete; the remaining `ai_specs/` files are still blank templates. Implementation order and architecture mapped out. No implementation code yet._
+_Project scaffolding complete. Ingestion pipeline (`src/ingest.py`) and Streamlit RAG app (`src/app.py`) are implemented with hybrid retrieval (Chroma + BM25 + FlashRank rerank). Ready to install dependencies and test end-to-end._
 
 ---
 
@@ -20,6 +20,10 @@ _Full project review completed. `overview.md` and `llm-integration.md` are compl
 
 - [x] Full project review: read all ai_specs, SDD docs, CLAUDE.md, and progress.md (2026-06-28)
 - [x] Mapped implementation order for Phase 1 MVP (2026-06-28)
+- [x] Project scaffolding: folder structure, requirements.txt, .env.example, .gitignore (2026-06-28)
+- [x] Document ingestion pipeline: `src/ingest.py` — DirectoryLoader, RecursiveCharacterTextSplitter, HuggingFace embeddings, ChromaDB (2026-06-28)
+- [x] Streamlit RAG app: `src/app.py` — hybrid retrieval (Chroma + BM25 EnsembleRetriever), FlashRank rerank, ChatOpenAI (OpenAI-compatible), chat history, source display (2026-06-28)
+- [x] Auto-commit/push workflow: SSH auth configured, CLAUDE.md directive added (2026-06-28)
 
 ---
 
@@ -27,7 +31,6 @@ _Full project review completed. `overview.md` and `llm-integration.md` are compl
 <!-- What is actively being worked on right now? -->
 
 - [ ] Fill in remaining spec templates (`features.md`, `architecture-planning.md`, `domain-knowledge.md`, `auth-security.md`, `deployment.md`)
-- [ ] Project scaffolding and document ingestion pipeline
 
 ---
 
@@ -43,9 +46,9 @@ _Full project review completed. `overview.md` and `llm-integration.md` are compl
 ## Up Next
 <!-- The next 2-3 tasks to tackle in the current phase -->
 
+- [ ] Install dependencies (`pip install -r requirements.txt`) and test ingestion + app end-to-end
+- [ ] Add real Temple HR documents to `data/` and re-run ingestion
 - [ ] Fill in remaining `ai_specs/` templates with HOOT-specific content
-- [ ] Set up project scaffolding (folder structure, dependencies, .env.example)
-- [ ] Build document ingestion pipeline (scrape Temple docs → chunk → embed → ChromaDB)
 
 ---
 
@@ -54,6 +57,7 @@ _Full project review completed. `overview.md` and `llm-integration.md` are compl
 
 | Date | What Was Done |
 |------|---------------|
+| 2026-06-28 | Built full project scaffolding: `requirements.txt`, `.env.example`, `.gitignore`, `data/sample.md`, `src/ingest.py` (DirectoryLoader → RecursiveCharacterTextSplitter → HuggingFace embeddings → ChromaDB), `src/app.py` (Streamlit chat UI with Chroma + BM25 EnsembleRetriever, FlashRank rerank via ContextualCompressionRetriever, ChatOpenAI with env-configurable provider, session-state chat history, source display). Set up SSH auth + auto-push in CLAUDE.md. |
 | 2026-06-28 | Full project review session: read all ai_specs, SDD site, CLAUDE.md, and progress.md. Mapped Phase 1 MVP scope, implementation order (ingestion → LLM client → prompts → RAG service → Streamlit UI → error handling → eval), and overall architecture. No code changes — research and planning only. |
 | 2026-06-22 | Filled in `llm-integration.md`: OpenAI-compatible swappable model layer (default `gpt-4o-mini`, env-configurable), structured-JSON answer output (`answered`/`answer`/`citations`), grounded-answer + HR-deferral prompt, category-tagged retrieval (benefits/policy/research/conduct) with top-k MVP and category-filter upgrade, RAGAS evaluation plan. Confirmed corpus spans multiple topic groups, not just policy. |
 | 2026-06-22 | Filled in `overview.md` from `HANDOVER.md`: name (HOOT), problem, goals/non-goals, users, stakeholders, constraints. Decided stack: Streamlit MVP-first, with React + FastAPI as the committed target architecture. Scope left broad (benefits + policy manual) for the team to narrow in `features.md`. |
