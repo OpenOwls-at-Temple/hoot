@@ -21,3 +21,12 @@
 - If you encounter a conflict between these spec files, flag it to the user before proceeding.
 - If a spec file is missing a detail you need, ask the user rather than assuming.
 - Never delete or overwrite any file in `ai_specs/` without explicit instruction.
+
+## Auto-Commit & Push
+
+After completing any meaningful unit of work (feature, fix, spec update, refactor, etc.):
+1. Stage the changed files with `git add` (only relevant files — never `.env` or secrets).
+2. Commit with a conventional message (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
+3. Push to `origin main` immediately.
+
+Do this automatically — never wait for the user to ask. The user should never need to run `git push` manually.
