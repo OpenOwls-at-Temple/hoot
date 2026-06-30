@@ -66,9 +66,11 @@
 - Commit messages: `type: short description`
   - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
   - Example: `feat: add BM25 to the hybrid retriever`
-- Every feature on its own branch; no direct commits to `main`.
-- Pull requests require at least one review before merging.
-- Never stage `.env`, secrets, or the local `chroma/` index.
+- **Never commit directly to `main`.** All changes go on a branch and through a PR.
+- Branch naming: `type/short-description` (e.g. `feat/deferral-guard`, `fix/citation-metadata`)
+- Pull requests target `main`; the user reviews and merges — Claude never merges or force-pushes.
+- **TDD required for PRs:** write failing tests first, implement to make them pass, all tests green before opening the PR.
+- Never stage `.env`, secrets, `chroma/`, or `chroma_db/`.
 
 ---
 
