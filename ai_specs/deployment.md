@@ -4,136 +4,157 @@
 > Defines how the application is built, configured, and deployed across environments.
 > Claude Code uses this file to understand deployment targets and avoid environment-specific mistakes.
 
+> **Reconciled for HOOT:** This template assumed a React + FastAPI + Postgres app with JWT auth. HOOT's MVP is a **Streamlit app over a local ChromaDB index with no database and no auth**. The tables below reflect HOOT's actual two-stage stack (Streamlit MVP → React + FastAPI target) and its real env vars (`LLM_*`, embeddings, Chroma). `DATABASE_URL` and `JWT_SECRET` are **not used** by HOOT — don't add them.
+
 ---
 
 ## Environments
-<!-- Define each environment and its purpose. -->
 
 | Environment | Purpose | URL |
 |-------------|---------|-----|
-| Local | Development and testing on your own machine | `http://localhost:5173` |
-| Staging | Pre-production testing, shared with the team | _e.g. `https://app-staging.vercel.app`_ |
-| Production | Live application for real users | _e.g. `https://app.vercel.app`_ |
+| Local (MVP) | Develop/test the Streamlit app on your machine | `http://localhost:8501` (Streamlit default) |
+| Local (target frontend) | Develop the React app (Phase 4) | `http://localhost:5173` (Vite default) |
+| Staging | Pre-production testing, shared with the team | MVP: a second Streamlit Community Cloud app · Target: `https://hoot-staging.vercel.app` |
+| Production | Live application for the Temple community | MVP: Streamlit Community Cloud app · Target: `https://hoot.vercel.app` |
 
 ---
 
 ## Hosting Platforms
-<!-- Where is each part of the application hosted and why? -->
 
+### MVP (Phase 1–2)
 | Component | Platform | Tier | Notes |
 |-----------|----------|------|-------|
-| Frontend | _e.g. Vercel_ | Free | _Auto-deploys from `main` branch_ |
-| Backend | _e.g. Render_ | Free | _Spins down after 15min inactivity_ |
-| Database | _e.g. Supabase_ | Free | _500MB limit on free tier_ |
-| File Storage | _e.g. Cloudflare R2_ | Free | _Optional, only if needed_ |
+| Streamlit app (UI + in-process RAG core) | Streamlit Community Cloud | Free | Auto-deploys from `main`. Secrets set in the app's **Settings → Secrets**. |
+| Vector index (ChromaDB) | Local persistent dir, built at deploy/ingest time | Free | Rebuilt by running ingestion; lives at `CHROMA_PATH`. |
+| Embedding model | `BAAI/bge-small-en`, downloaded at runtime | Free | Cached after first download. |
+| LLM | OpenAI-compatible provider (configured via env) | Pay-per-use / free if local | `gpt-4o-mini` by default; can point at a local model. |
+
+### Target (Phase 4)
+| Component | Platform | Tier | Notes |
+|-----------|----------|------|-------|
+| Frontend (React 18 + Vite) | Vercel | Free | Auto-deploys from `main`. |
+| Backend (FastAPI + RAG core) | Render | Free | Spins down after ~15 min inactivity (cold starts). |
+| Vector store | ChromaDB on a Render persistent disk → Qdrant if scale demands | Free → paid only if needed | Persist the index so it survives restarts. |
 
 ---
 
 ## Environment Variables
-<!-- List every environment variable required to run the application.
-     Never put actual values here. Use a .env.example file for that. -->
+<!-- Never put actual values here. Use .env.example for dummy values. -->
 
-### Backend
+### RAG core / backend (used by Streamlit MVP and FastAPI target)
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Yes | Anthropic API key for LLM calls |
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `JWT_SECRET` | Yes | Secret key for signing JWT tokens |
+| `LLM_BASE_URL` | Yes | Base URL of the OpenAI-compatible LLM endpoint |
+| `LLM_API_KEY` | Yes | API key for the LLM provider (server-side only) |
+| `LLM_MODEL` | Yes | Model name (default `gpt-4o-mini`) |
+| `EMBEDDING_MODEL` | No | Embedding model (default `BAAI/bge-small-en`) |
+| `CHROMA_PATH` | No | Path to the persistent ChromaDB index (default `./chroma`) |
 | `ENVIRONMENT` | Yes | `local`, `staging`, or `production` |
-| _`VARIABLE_NAME`_ | _Yes/No_ | _Description_ |
 
-### Frontend
+### Frontend (Phase 4 only)
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VITE_API_BASE_URL` | Yes | Base URL of the backend API |
-| _`VARIABLE_NAME`_ | _Yes/No_ | _Description_ |
+| `VITE_API_BASE_URL` | Yes | Base URL of the FastAPI backend |
 
-> ⚠️ Never commit `.env` files to the repository. Add them to `.gitignore`.
-> Always keep a `.env.example` file with dummy values checked in.
+> ⚠️ Never commit `.env` files. Add them to `.gitignore`. Keep a `.env.example` with dummy values checked in.
+> **Not used by HOOT:** `DATABASE_URL` (no relational DB in the MVP), `JWT_SECRET` (no auth). Don't add them "just in case."
 
 ---
 
 ## Local Development Setup
-<!-- Step-by-step instructions to run the project locally from scratch. -->
 
 ### Prerequisites
-- _e.g. Node.js 20+_
-- _e.g. Python 3.11+_
-- _e.g. PostgreSQL 15+_
-- _e.g. A free Anthropic API key from console.anthropic.com_
+- Python 3.11+
+- (Phase 4 only) Node.js 20+ for the React frontend
+- An API key for an OpenAI-compatible LLM provider — **or** a local model (Ollama / vLLM) exposing an OpenAI-compatible endpoint
+- Enough disk for the embedding model and Chroma index
 
-### Steps
+### Steps — MVP (Streamlit)
 
 ```bash
 # 1. Clone the repository
 git clone [repo-url]
-cd [project-name]
+cd hoot
 
-# 2. Set up backend
-cd backend
-cp .env.example .env        # Fill in your actual values
+# 2. Create a virtual environment and install dependencies
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m uvicorn app.main:app --reload
 
-# 3. Set up frontend (in a new terminal)
+# 3. Configure environment
+cp .env.example .env             # Fill in LLM_BASE_URL, LLM_API_KEY, LLM_MODEL
+
+# 4. Add documents and build the index
+#    Place public Temple documents in data/ , then:
+python src/ingest.py
+
+# 5. Run the app
+streamlit run src/app.py         # serves on http://localhost:8501
+```
+
+### Steps — Target frontend (Phase 4)
+
+```bash
+# In a new terminal, with the FastAPI backend running:
 cd frontend
-cp .env.example .env        # Fill in your actual values
+cp .env.example .env             # set VITE_API_BASE_URL to the backend URL
 npm install
-npm run dev
+npm run dev                      # serves on http://localhost:5173
 ```
 
 ---
 
 ## Deployment Process
-<!-- How do you deploy to staging and production? -->
 
-### Frontend (Vercel)
-1. Push to `main` branch — Vercel auto-deploys
-2. Environment variables are set in the Vercel dashboard under _Settings → Environment Variables_
-3. Check deployment status at `https://vercel.com/dashboard`
+### MVP — Streamlit Community Cloud
+1. Push to `main` — the connected Streamlit app auto-deploys.
+2. Set `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` (and any others) in the app's **Settings → Secrets** (never in the repo).
+3. Ensure the index exists: either commit a prebuilt `chroma/` (if small and public) or run ingestion as part of startup. Confirm the corpus is public-only.
+4. Verify the live app answers a known question with correct citations and defers correctly on an out-of-corpus question.
 
-### Backend (Render)
-1. Push to `main` branch — Render auto-deploys
-2. Environment variables are set in the Render dashboard under _Environment_
-3. First deploy may take 3-5 minutes
-4. Check logs at `https://dashboard.render.com`
+### Target — Frontend (Vercel)
+1. Push to `main` — Vercel auto-deploys.
+2. Set `VITE_API_BASE_URL` in the Vercel dashboard (**Settings → Environment Variables**).
+3. Check status at `https://vercel.com/dashboard`.
 
-### Database (Supabase)
-1. Migrations are run manually: `python -m alembic upgrade head`
-2. Never modify the production database schema directly
-3. Always test migrations on staging first
+### Target — Backend (Render)
+1. Push to `main` — Render auto-deploys.
+2. Set `LLM_*`, `EMBEDDING_MODEL`, `CHROMA_PATH`, `ENVIRONMENT` in the Render dashboard (**Environment**).
+3. First deploy may take 3–5 minutes; expect cold starts after inactivity on the free tier.
+4. Attach a persistent disk for the Chroma index so it survives restarts.
+5. Check logs at `https://dashboard.render.com`.
 
 ---
 
 ## CI/CD Pipeline
-<!-- Describe any automated build, test, or deploy pipelines. -->
 
-_e.g. GitHub Actions runs on every pull request:_
-- Linting (`black`, `eslint`)
-- Unit tests (`pytest`, `jest`)
-- Build check
+GitHub Actions runs on every pull request:
+- Linting: `black --check` (Python); `eslint` (frontend, Phase 4)
+- Unit tests: `pytest` (backend/RAG core); `jest`/`vitest` (frontend, Phase 4)
+- Build check (frontend, Phase 4)
 
-_Merging to `main` triggers automatic deployment to staging._
-_Production deploys are manual and require faculty approval._
+Merging to `main` triggers automatic deployment to staging (Streamlit app / Vercel + Render).
+Production promotion is manual and requires sponsor/faculty approval.
 
 ---
 
 ## Common Deployment Issues
-<!-- Document problems the team has encountered and how to fix them. -->
 
 | Issue | Likely Cause | Fix |
 |-------|-------------|-----|
-| Backend returns 500 on first request | Missing environment variable | Check Render logs, verify all env vars are set |
-| Frontend can't reach backend | Wrong `VITE_API_BASE_URL` | Confirm the backend URL in Vercel env vars |
-| Database connection fails | `DATABASE_URL` format incorrect | Use the connection string from Supabase dashboard |
-| _Add more as you encounter them_ | | |
+| App errors on first question | Missing `LLM_API_KEY` / `LLM_BASE_URL` | Set them in Streamlit Secrets / Render env; redeploy. |
+| Every question defers | Index empty or not found | Run `python src/ingest.py`; confirm `CHROMA_PATH` matches where the index was built. |
+| Answers cite nothing / poor matches | Embedding model mismatch between ingest and query | Use the same `EMBEDDING_MODEL` for both; re-ingest if changed. |
+| Slow first response after idle | Render free-tier cold start | Expected; add a health-check ping or upgrade tier if needed. |
+| Frontend can't reach backend (Phase 4) | Wrong `VITE_API_BASE_URL` | Confirm the backend URL in Vercel env vars. |
+| LLM cost/quota spikes | No rate limiting / abuse | Add rate limiting (see `auth-security.md`); check provider dashboard. |
 
 ---
 
 ## Secrets Management
-<!-- How are secrets handled safely? -->
 
-- All secrets are stored in the hosting platform's environment variable settings, never in code
-- Rotate the `JWT_SECRET` and `ANTHROPIC_API_KEY` if they are ever accidentally committed
-- Each environment (local, staging, production) uses its own separate API keys and database
-- Students should use their own personal API keys for local development
+- All secrets live in the hosting platform's environment/secret settings, never in code.
+- Rotate `LLM_API_KEY` immediately if it is ever committed or exposed.
+- Each environment (local, staging, production) uses its own separate keys.
+- Students use their **own personal API keys** for local development.
+- The LLM key is only ever set where server-side code runs (Streamlit host / Render) — never exposed to the React frontend or browser.
