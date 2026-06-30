@@ -10,7 +10,7 @@
 
 ## Domain Overview
 
-HOOT operates in the **higher-education HR and policy information** domain. It answers natural-language questions for the Temple University community (students, faculty, and staff) about benefits, HR policy, conduct rules, and research/funding opportunities — using only Temple's own **publicly published** documents. It is an information-retrieval and grounding system, not a system of record: it holds no individual's data and makes no decisions about any person.
+HOOT operates in the **higher-education HR and policy information** domain. It answers natural-language questions for **Temple University faculty** about benefits, HR policy, conduct rules, and research/funding opportunities — using only Temple's own **publicly published** documents. It is an information-retrieval and grounding system, not a system of record: it holds no individual's data and makes no decisions about any person.
 
 ---
 
@@ -41,7 +41,7 @@ HOOT operates in the **higher-education HR and policy information** domain. It a
 - **Public documents only.** Nothing behind the TUportal login is ingested or referenced; `robots.txt` is respected at ingestion time.
 - **No PII handling.** HOOT does not collect, store, or send to the LLM any personal/employee/student records. It connects to no individual's data.
 - **Informational, not authoritative.** Answers are not official HR or legal advice; the underlying Temple documents and HR staff remain the authority. The UI must say so.
-- **Don't infer who the user is.** HOOT does not guess a user's role to tailor coverage. It answers from the document and lets the source state who is covered.
+- **Don't personalize beyond the document.** HOOT does not know the individual faculty member's tenure status, rank, or appointment type. It answers from the document and lets the source state which conditions apply.
 - **Citations reflect actual use.** A source is cited only if it supports a claim in the answer.
 - **Freshness is surfaced, not hidden.** Each answer shows the source's `last_updated` date so users can judge currency.
 
@@ -53,7 +53,7 @@ HOOT operates in the **higher-education HR and policy information** domain. It a
 - **Embedding consistency.** The same embedding model (`BAAI/bge-small-en`) must be used at ingestion and at query time, or retrieval silently degrades.
 - **Section-aware chunking.** Chunk on headings/sections, not fixed character counts, so a policy stays whole and citations point to a coherent passage.
 - **Max output ~500 tokens.** Answers are concise and point to the source rather than reproducing it.
-- **Coverage applicability varies by population.** Many policies apply differently to students vs. faculty vs. staff (e.g., tuition remission, leave). The answer must reflect what the source says about applicability and must not over-generalize.
+- **Coverage applicability varies within faculty.** Many policies apply differently to tenure-track vs. adjunct vs. clinical faculty (e.g., sabbatical eligibility, tuition remission tiers). The answer must reflect what the source says and must not over-generalize across faculty categories.
 - **Source documents drift.** Benefits and policy pages change; stale answers are a real risk. Re-ingestion on a schedule is part of correctness, not just hygiene.
 
 ---
@@ -61,7 +61,7 @@ HOOT operates in the **higher-education HR and policy information** domain. It a
 ## Common Pitfalls
 
 - **Taxability nuance.** Statements like "tuition remission is tax-free" are dangerous; the source typically has IRS-limit caveats. Cite the document; don't simplify away the caveat.
-- **Over-generalizing across populations.** Answering a staff question with a faculty-only rule (or vice versa) is a subtle, high-impact error. Anchor to what the cited source actually covers.
+- **Over-generalizing within faculty categories.** Answering a tenure-track question with an adjunct-only rule (or vice versa) is a subtle, high-impact error. Anchor to what the cited source actually says about who is covered.
 - **Confusing similar policies.** Sick leave vs. FMLA vs. short-term disability; outside teaching vs. consulting/conflict-of-interest. Exact-term retrieval (BM25) matters here.
 - **Stale information presented as current.** Always surface `last_updated`; an old date is information, not noise.
 - **Treating "no result" as a bug.** Empty retrieval should produce a clean deferral, not a stretched-thin answer from a weakly related chunk.

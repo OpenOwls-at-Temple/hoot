@@ -23,11 +23,11 @@ The sections below are filled in against this reality. Where the generic templat
 
 | Question | Decision |
 |----------|----------|
-| Expected number of users | Low thousands at most — the Temple community (students, faculty, staff). Design for hundreds-to-thousands, not millions. |
-| Growth expectation | Roughly flat; bounded by Temple's population. No viral scaling. |
-| User model | Multi-user, single-tenant — everyone shares one application instance and one public corpus. |
-| Do users belong to groups? | No app-enforced groups. Policies may apply to subsets of the community, but HOOT does not model or check that — the cited document states applicability. |
-| Anonymous / guest access? | **Yes (MVP).** All content is public, so anonymous use is allowed. An optional Temple-account gate can be enabled later (Phase 4). |
+| Expected number of users | Hundreds — Temple's faculty body. Design for hundreds, not thousands. |
+| Growth expectation | Roughly flat; bounded by the faculty headcount. No viral scaling. |
+| User model | Multi-user, single-tenant — all faculty share one application instance and one corpus. |
+| Do users belong to groups? | No app-enforced groups. All users are faculty; policy nuances (tenure-track vs. adjunct, etc.) are stated in the cited document, not enforced by HOOT. |
+| Anonymous / guest access? | **Yes (MVP).** Corpus is public-facing, so anonymous use is allowed. An optional Temple-account gate can be enabled later (Phase 4). |
 
 ---
 
@@ -58,7 +58,7 @@ The sections below are filled in against this reality. Where the generic templat
 
 | Role | Permissions |
 |------|-------------|
-| Visitor (anonymous or signed-in Temple user) | Ask questions; read grounded answers and citations. Read-only. Identical access for everyone. |
+| Visitor (anonymous or signed-in faculty) | Ask questions; read grounded answers and citations. Read-only. Identical access for all users. |
 | Maintainer (OpenOwls team) | Runs the **ingestion pipeline** and deployments. This is an **operational** role exercised via the repo/CLI and hosting dashboards — **not** an in-app admin login. |
 | Feedback reviewer *(Phase 2/3, optional)* | Reviews aggregated, de-identified thumbs-up/down feedback to improve retrieval. No access to anything else. |
 
@@ -86,11 +86,11 @@ The sections below are filled in against this reality. Where the generic templat
 | Data | Classification | Protection |
 |------|---------------|------------|
 | LLM API key (`LLM_API_KEY`) | Secret | Server-side environment variable only; never committed, never sent to the client. The single most important secret in the system. |
-| User question text | Potentially user-volunteered PII | HOOT doesn't ask for PII, but a user might type some. Don't persist raw questions with identifying detail; if questions are logged for eval, scrub or aggregate. Never send anything beyond the question + retrieved public chunks to the LLM. |
-| Ingested documents | Public | Public by definition (corpus is public-only). No special protection needed, but ingestion must confirm a source is public before indexing it. |
+| User question text | Potentially user-volunteered PII | HOOT doesn't ask for PII, but a faculty member might type some. Don't persist raw questions with identifying detail; if questions are logged for eval, scrub or aggregate. Never send anything beyond the question + retrieved chunks to the LLM. |
+| Ingested documents | Public | Corpus is public-facing. No special protection needed, but ingestion must confirm a source is public before indexing it. |
 | Feedback records *(Phase 2/3)* | De-identified | Store rating + question + sources only; no user identity. |
 
-> HOOT collects **no** passwords, employee records, student records, or account data — there is nothing of that kind in the system to leak.
+> HOOT collects **no** passwords, employee records, or account data — there is nothing of that kind in the system to leak.
 
 ---
 

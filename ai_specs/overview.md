@@ -11,13 +11,13 @@
 
 ## One-Line Description
 
-A citation-backed answer engine that helps the Temple University community — students, faculty, and staff — get trustworthy answers to HR, benefits, policy, and conduct questions, drawn **only** from Temple's own published documents, each linked back to its source.
+A citation-backed answer engine that helps Temple University faculty get trustworthy answers to HR, benefits, policy, and conduct questions, drawn **only** from Temple's own published documents, each linked back to its source.
 
 ---
 
 ## Problem Statement
 
-Temple's public HR and policy information is genuinely public but fragmented across at least four separate systems. A faculty member asking *"is my graduate tuition benefit taxable?"* must dig through a benefits-summary PDF, while *"can I teach at another university?"* lives in the Faculty Handbook on a completely different subdomain. A student worker asking about pay schedules, or a staff member asking about FMLA, faces the same scavenger hunt. There is no single place to ask a plain-language question and get a reliable, sourced answer.
+Temple's faculty-facing HR and policy information is genuinely public but fragmented across at least four separate systems. A faculty member asking *"is my graduate tuition benefit taxable?"* must dig through a benefits-summary PDF, while *"can I teach at another university?"* lives in the Faculty Handbook on a completely different subdomain. There is no single place to ask a plain-language question and get a reliable, sourced answer.
 
 HOOT solves this with a Retrieval-Augmented Generation (RAG) pipeline: it retrieves the right Temple document and answers **only** from it, always with a citation back to the source. The guiding principle is that for HR content, a confidently wrong answer (e.g., about FMLA eligibility or tuition-benefit taxability) is worse than no answer. Every design decision serves two goals: **retrieve the right chunk, and don't hallucinate beyond it.**
 
@@ -28,7 +28,7 @@ HOOT solves this with a Retrieval-Augmented Generation (RAG) pipeline: it retrie
 - **Accurate, sourced answers.** Every answer cites and links the Temple document it came from; no answer is given without a source.
 - **No hallucination.** When the answer isn't in Temple's published documents, HOOT says so and points the user to HR rather than guessing.
 - **Reduce time-to-answer.** A community member gets a sourced answer in seconds instead of searching multiple websites and PDFs.
-- **Serve the whole Temple community.** Students, faculty, and staff can all ask questions; answers surface the document and note who it applies to where the source makes that clear.
+- **Serve Temple faculty.** Faculty members can ask questions in plain language and get sourced answers drawn from the documents that govern their employment, benefits, research, and conduct.
 - **Demoable in one semester.** Ship a working MVP (ask a question → get a cited answer) that can be shown to the community and stakeholders.
 - **Measurable retrieval quality.** Build a test set of 30–50 real questions with known correct sources and measure retrieval + answer quality against it.
 
@@ -45,11 +45,9 @@ HOOT solves this with a Retrieval-Augmented Generation (RAG) pipeline: it retrie
 
 | User Type | Description |
 |-----------|-------------|
-| Primary Users | Temple University **students, faculty, and staff** asking natural-language questions about HR policy, benefits, research/funding opportunities, and conduct rules. |
-| Secondary Users | Temple HR / Faculty Affairs staff, who validate accuracy and may provide cleaner source data. |
-| Internal Users | The OpenOwls student team building, testing, and maintaining the system (also responsible for the ingestion pipeline). |
-
-> **Audience note:** Some policies apply only to a subset of the community (e.g., tuition remission rules differ for staff vs. faculty; some benefits are employee-only). HOOT does **not** try to infer a user's role — it answers from the document and lets the cited source speak to who is covered. See `domain-knowledge.md`.
+| Primary User | Temple University **faculty** asking natural-language questions about HR policy, benefits, research/funding opportunities, and conduct rules. |
+| Secondary User | Temple HR / Faculty Affairs staff, who validate accuracy and may provide cleaner source data. |
+| Internal User | The OpenOwls student team building, testing, and maintaining the system (also responsible for the ingestion pipeline). |
 
 ---
 
@@ -82,7 +80,7 @@ HOOT ships in two stages. The **MVP** proves the RAG pipeline works with the lea
 | Faculty Sponsor | Defines scope, reviews milestones, owns `overview.md` and `features.md`. |
 | Student Team (OpenOwls) | Design, implementation, evaluation, deployment, and ingestion maintenance. |
 | Temple HR / Faculty Affairs | **Recommended to loop in early** — provides accuracy validation, possibly cleaner source data, and goodwill; heads off "is this official?" confusion. |
-| Community Testers | A few willing students, faculty, and staff who test answers and give feedback in later phases. |
+| Faculty Testers | A few willing faculty who test answers and give feedback in later phases. |
 
 ---
 

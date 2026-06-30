@@ -22,7 +22,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 <!-- The smallest useful version: ask a question, get a cited answer, or an honest "I don't know." -->
 
 ### Feature 1: Ask a Question and Get a Grounded Answer
-**As a** member of the Temple community (student, faculty, or staff),
+**As a** Temple faculty member,
 **I want to** type a plain-language HR/policy question and get a clear answer,
 **So that** I don't have to search four separate websites and PDFs myself.
 
@@ -34,7 +34,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 ---
 
 ### Feature 2: Every Answer Shows Its Sources
-**As a** community member,
+**As a** faculty member,
 **I want to** see exactly which Temple document(s) an answer came from, with links,
 **So that** I can trust the answer and read the authoritative source myself.
 
@@ -46,9 +46,9 @@ Each feature includes a short description and a set of acceptance criteria writt
 ---
 
 ### Feature 3: Honest Deferral When the Answer Isn't Found
-**As a** community member,
+**As a** faculty member,
 **I want to** be told clearly when HOOT doesn't have the answer,
-**So that** I'm never misled by a confident but wrong response on something that matters.
+**So that** I'm never misled by a confident but wrong answer on something that affects my employment, benefits, or research.
 
 **Acceptance Criteria:**
 - [ ] Given a question with no supporting content in the corpus, when I submit it, then HOOT replies that it couldn't find the answer in Temple's published documents and directs me to HR (215-204-7174).
@@ -58,7 +58,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 ---
 
 ### Feature 4: Scope & Trust Disclaimer
-**As a** community member,
+**As a** faculty member,
 **I want to** clearly understand what HOOT is and isn't,
 **So that** I don't mistake it for official HR or legal advice.
 
@@ -84,7 +84,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 <!-- Adds value once the core loop is solid. -->
 
 ### Feature 6: Conversational Follow-Ups
-**As a** community member,
+**As a** faculty member,
 **I want to** ask follow-up questions in the same session,
 **So that** I can refine my question without retyping context.
 
@@ -95,7 +95,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 ---
 
 ### Feature 7: Answer Feedback (Thumbs Up / Down)
-**As a** community member,
+**As a** faculty member,
 **I want to** flag whether an answer was helpful or wrong,
 **So that** the team can find weak spots and improve retrieval.
 
@@ -106,7 +106,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 ---
 
 ### Feature 8: Source Preview & Freshness Signals
-**As a** community member,
+**As a** faculty member,
 **I want to** preview the relevant passage and see how recently the source was updated,
 **So that** I can judge whether the information is current.
 
@@ -131,7 +131,7 @@ Each feature includes a short description and a set of acceptance criteria writt
 <!-- AI enhancements and measurement. -->
 
 ### Feature 10: Question Category Routing
-**As a** community member,
+**As a** faculty member,
 **I want** HOOT to focus retrieval on the right topic area for my question,
 **So that** I get more precise answers, especially when topics overlap.
 
@@ -160,8 +160,8 @@ Each feature includes a short description and a set of acceptance criteria writt
 **So that** we can control abuse and cost without changing what data is served.
 
 **Acceptance Criteria:**
-- [ ] Given the gate is enabled, when an anonymous visitor arrives, then they are asked to sign in with a Temple Google (@temple.edu) account before asking questions.
-- [ ] Given the gate is disabled (MVP default), when a visitor arrives, then they can ask questions anonymously.
+- [ ] Given the gate is enabled, when an unauthenticated user arrives, then they are asked to sign in with a Temple Google (@temple.edu) account before asking questions.
+- [ ] Given the gate is disabled (MVP default), when a user arrives, then they can ask questions without signing in.
 - [ ] Given sign-in is used, when a user authenticates, then **no** new personal data is collected or stored beyond what's needed for the session. (See `auth-security.md`.)
 
 ---
