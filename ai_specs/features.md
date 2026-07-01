@@ -18,6 +18,54 @@ Each feature includes a short description and a set of acceptance criteria writt
 
 ---
 
+## UI Design Principles
+
+> These principles govern both the Streamlit MVP (Phase 1–3) and the React migration (Phase 4).
+> The core rule: **every UI element must earn its place**. If a faculty member doesn't need it to get their answer, it doesn't exist yet.
+
+### Guiding Principles
+
+1. **One job per screen.** The screen exists to answer a question. No dashboard, no navigation menu, no settings panel. A faculty member arrives, asks, and leaves.
+
+2. **Disclaimer first, always.** The scope/trust disclaimer (Feature 4) must be the first thing visible — above the chat input, always in view. It is not a modal, not a footer, not a tooltip.
+
+3. **Chat-native layout.** Use a conversational flow: input at the bottom, answers grow upward. Do not simulate a search results page. Do not use cards, tables, or sidebars.
+
+4. **Answer before sources.** The answer text renders immediately, then sources appear below it in a collapsed expander. The user reads the answer first; sources are there if they need to verify.
+
+5. **Sources show human-readable metadata.** Each source displays its `title` (as a clickable link), `category` label, and `last_updated` date. Raw file paths are never shown to users.
+
+6. **Deferral is not an error.** When HOOT can't find an answer, the deferral message renders in the same visual style as a normal answer — no red banners, no warning icons. Not knowing is correct behavior.
+
+7. **No clutter.** Phase 1 has: a title, a disclaimer caption, a chat input, and conversation messages with expandable sources. Nothing else.
+
+### MVP Layout
+
+```
+┌─────────────────────────────────────────────┐
+│  🦉 HOOT — Helpful Owl Of Temple            │
+│  Informational tool — not official advice   │  ← always visible
+├─────────────────────────────────────────────┤
+│  [User question bubble]                     │
+│                                             │
+│  [HOOT answer in plain text]                │
+│  ▼ Sources                                  │
+│    • Benefits Guide (benefits)              │
+│      temple.edu/hr/benefits   2026-01-10    │
+├─────────────────────────────────────────────┤
+│  Ask about Temple faculty HR policies...    │  ← st.chat_input
+└─────────────────────────────────────────────┘
+```
+
+### What to Avoid
+
+- No sidebar navigation or visible category picker (category routing is AI-powered in Phase 3, transparent to the user — see Feature 10)
+- No login gate in Phase 1–3 (see `auth-security.md`)
+- No settings panel, theme toggle, or font controls
+- No raw file paths or internal IDs shown to users
+
+---
+
 ## Phase 1 — Core MVP
 <!-- The smallest useful version: ask a question, get a cited answer, or an honest "I don't know." -->
 
@@ -130,15 +178,18 @@ Each feature includes a short description and a set of acceptance criteria writt
 ## Phase 3 — Advanced / AI Features
 <!-- AI enhancements and measurement. -->
 
-### Feature 10: Question Category Routing
-**As a** faculty member,
-**I want** HOOT to focus retrieval on the right topic area for my question,
-**So that** I get more precise answers, especially when topics overlap.
+### Feature 10: AI-Powered Question Category Routing *(invisible to user)*
+**As a** member of the OpenOwls team,
+**I want** the system to automatically classify each question into a topic area before retrieval,
+**So that** retrieval is more precise without adding friction for the faculty member asking.
+
+> **Design rationale:** Category routing is AI-driven and transparent to the user — the faculty member never selects a category. This is intentional. Faculty questions frequently span multiple categories (e.g., "can I consult externally?" touches `policy` and `conduct`). Forcing a manual category pick adds friction and risks misdirected retrieval. The Phase 1 approach (search all categories) works correctly; this feature narrows search space automatically as an optimization.
 
 **Acceptance Criteria:**
-- [ ] Given a question, when it is processed, then it is classified into one of `benefits` / `policy` / `research` / `conduct` (or `unknown`).
-- [ ] Given a confident classification, when retrieval runs, then it can be filtered to that category to improve precision.
-- [ ] Given an `unknown` classification, when retrieval runs, then it falls back to searching all categories (Phase 1 behavior).
+- [ ] Given a question, when it is processed, then it is classified into one of `benefits` / `policy` / `research` / `conduct` (or `unknown`) — with no user interaction required.
+- [ ] Given a confident classification, when retrieval runs, then it is filtered to that category to improve precision.
+- [ ] Given an `unknown` classification, when retrieval runs, then it searches all categories (Phase 1 fallback behavior).
+- [ ] Given any classification result, when the answer is shown, then the user sees no routing UI — only the answer and sources.
 
 ---
 
