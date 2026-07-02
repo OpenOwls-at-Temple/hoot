@@ -22,11 +22,33 @@
 - If a spec file is missing a detail you need, ask the user rather than assuming.
 - Never delete or overwrite any file in `ai_specs/` without explicit instruction.
 
-## Auto-Commit & Push
+## Branch, Commit & PR Workflow
 
-After completing any meaningful unit of work (feature, fix, spec update, refactor, etc.):
-1. Stage the changed files with `git add` (only relevant files — never `.env` or secrets).
-2. Commit with a conventional message (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
-3. Push to `origin main` immediately.
+**Never commit directly to `main`.** All work goes through a branch and a pull request that the user reviews and merges.
 
-Do this automatically — never wait for the user to ask. The user should never need to run `git push` manually.
+### For every meaningful unit of work (feature, fix, spec update, refactor, etc.):
+
+1. **Create a branch** from the latest `main` using the conventional name format:
+   - `feat/short-description` — new feature
+   - `fix/short-description` — bug fix
+   - `docs/short-description` — spec or documentation update
+   - `refactor/short-description` — code restructuring
+   - `test/short-description` — adding or updating tests
+   - `chore/short-description` — tooling, config, deps
+
+2. **Follow TDD** — write tests before (or alongside) implementation:
+   - Write failing tests that define the expected behavior first.
+   - Implement the code to make those tests pass.
+   - All tests must pass before opening the PR.
+
+3. **Stage and commit** only relevant files — never `.env`, secrets, `chroma/`, or `chroma_db/`.
+   - Use conventional commit messages: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+4. **Push the branch** to `origin` and **open a pull request** targeting `main`:
+   - PR title: concise, matches the branch type (e.g. `feat: add deferral guard to RAG service`)
+   - PR body: what changed, why, and a short test plan checklist
+   - Assign the PR to the user for review
+
+5. **Do not merge** — the user reviews and merges the PR. Never push directly to `main` or use `--force`.
+
+Do all of this automatically — never wait for the user to ask.

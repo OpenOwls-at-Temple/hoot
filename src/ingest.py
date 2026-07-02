@@ -1,67 +1,104 @@
+import os
+import re
 import shutil
 import sys
 from pathlib import Path
 
+import yaml
 from dotenv import load_dotenv
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 load_dotenv()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
-CHROMA_DIR = PROJECT_ROOT / "chroma_db"
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+CHROMA_PATH = os.getenv("CHROMA_PATH", str(PROJECT_ROOT / "chroma"))
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en")
+
+_FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
+
+_MD_HEADERS = [("#", "h1"), ("##", "h2"), ("###", "h3")]
 
 
-def load_documents():
-    loader = DirectoryLoader(
-        str(DATA_DIR),
-        glob="**/*.md",
-        loader_cls=TextLoader,
-        loader_kwargs={"encoding": "utf-8"},
-    )
-    docs = loader.load()
-    if not docs:
+def extract_frontmatter(text: str) -> tuple:
+    """Return (meta_dict, body_str). meta_dict is empty if no frontmatter found."""
+    m = _FRONTMATTER_RE.match(text)
+    if m:
+        meta = yaml.safe_load(m.group(1)) or {}
+        return meta, text[m.end():]
+    return {}, text
+
+
+def extract_title(body: str, filename: str) -> str:
+    """Return the first H1 heading from body, or a title derived from the filename."""
+    for line in body.splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return Path(filename).stem.replace("_", " ").title()
+
+
+def load_documents() -> list:
+    """
+    Load every .md file in DATA_DIR, extract frontmatter metadata, split by
+    markdown heading (section-aware chunking), and return a list of Documents
+    with title, url, category, last_updated, and source metadata fields set.
+    """
+    md_files = sorted(DATA_DIR.glob("**/*.md"))
+    if not md_files:
         print(f"No .md files found in {DATA_DIR}")
         sys.exit(1)
-    print(f"Loaded {len(docs)} document(s) from {DATA_DIR}")
-    return docs
 
-
-def split_documents(docs):
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
+    splitter = MarkdownHeaderTextSplitter(
+        headers_to_split_on=_MD_HEADERS,
+        strip_headers=False,
     )
-    chunks = splitter.split_documents(docs)
-    print(f"Split into {len(chunks)} chunk(s)")
-    return chunks
+
+    all_docs = []
+    for path in md_files:
+        raw = path.read_text(encoding="utf-8")
+        meta, body = extract_frontmatter(raw)
+        title = extract_title(body, path.name)
+
+        chunks = splitter.split_text(body)
+        for chunk in chunks:
+            chunk.metadata.update(
+                {
+                    "title": title,
+                    "url": str(meta.get("source_url") or ""),
+                    "category": str(meta.get("category") or ""),
+                    "last_updated": str(meta.get("last_updated") or ""),
+                    "source": str(path),
+                }
+            )
+            all_docs.append(chunk)
+
+    print(f"Loaded {len(md_files)} file(s), split into {len(all_docs)} chunk(s)")
+    return all_docs
 
 
-def embed_and_store(chunks):
+def embed_and_store(docs: list) -> None:
+    """Embed docs with EMBEDDING_MODEL and store in ChromaDB at CHROMA_PATH."""
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+    chroma_dir = Path(CHROMA_PATH)
 
-    if CHROMA_DIR.exists():
-        shutil.rmtree(CHROMA_DIR)
-        print(f"Cleared existing vector store at {CHROMA_DIR}")
+    if chroma_dir.exists():
+        shutil.rmtree(chroma_dir)
+        print(f"Cleared existing vector store at {chroma_dir}")
 
-    vectorstore = Chroma.from_documents(
-        documents=chunks,
+    Chroma.from_documents(
+        documents=docs,
         embedding=embeddings,
-        persist_directory=str(CHROMA_DIR),
+        persist_directory=str(chroma_dir),
     )
-    print(f"Stored {len(chunks)} chunk(s) in {CHROMA_DIR}")
-    return vectorstore
+    print(f"Stored {len(docs)} chunk(s) in {chroma_dir}")
 
 
-def main():
+def main() -> None:
     print("=== HOOT Document Ingestion ===")
     docs = load_documents()
-    chunks = split_documents(docs)
-    embed_and_store(chunks)
+    embed_and_store(docs)
     print("Ingestion complete.")
 
 
