@@ -2,18 +2,16 @@ import json
 import os
 from typing import Optional
 
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 
 from llm.prompts import DEFERRAL, GROUNDED_ANSWER_SYSTEM
 
 
 class LLMClient:
     def __init__(self) -> None:
-        self._llm = ChatOpenAI(
-            base_url=os.getenv("LLM_BASE_URL"),
-            api_key=os.getenv("LLM_API_KEY", "none"),
-            model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+        self._llm = ChatAnthropic(
+            model=os.getenv("LLM_MODEL", "claude-sonnet-5"),
             temperature=0,
         )
 
