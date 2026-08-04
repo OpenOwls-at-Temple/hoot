@@ -35,7 +35,7 @@ RAG core has been extracted out of `app.py` into isolated, testable modules (`ll
 
 ## In Progress
 
-- [ ] PR `feat/rag-core-refactor` open for review → merge to main
+- [ ] PR `feat/improved-frontend` open for review → merge to main
 
 ---
 
@@ -79,6 +79,7 @@ RAG core has been extracted out of `app.py` into isolated, testable modules (`ll
 
 | Date | What Was Done |
 |------|---------------|
+| 2026-07-20 | Professor feedback: improved Streamlit frontend (wide layout, sidebar with Temple branding + model info + clear-chat, hero banner, clickable example cards, styled citation cards with badges, disclaimer footer). Switched LLM from OpenAI-compatible to Anthropic SDK (`langchain-anthropic`, `ChatAnthropic`); model updated to `claude-sonnet-5`. Updated `requirements.txt` (removed `langchain-openai`, added `langchain-anthropic`) and `.env.example` (now uses `ANTHROPIC_API_KEY` + `LLM_MODEL=claude-sonnet-5`). |
 | 2026-07-02 | Implemented document download pipeline (`scripts/download_docs.py`): fetches 7 real Temple public pages (faculty resources, working at Temple, wellness, research grants, research centers, research news), converts HTML→markdown with frontmatter, saves to data/. Ran `src/ingest.py` — 11 documents, 66 chunks stored in ChromaDB (chroma_db/). Verified hybrid Chroma+BM25 retrieval correctly surfaces tuition_remission.md for tuition benefit queries. App is runnable — needs real `LLM_API_KEY` in .env to answer questions. |
 | 2026-06-30 | Professor feedback: added UI Design Principles section to features.md (single-column, disclaimer-first, chat-native, sources in expander, deferral not styled as error). Updated Feature 10 (category routing) with design rationale — AI-powered and invisible to user; faculty questions span categories so user-driven picker would add friction. Confirmed Option A (one-step: type → answer + sources) as the UX approach. |
 | 2026-06-30 | RAG core refactor (PR `feat/rag-core-refactor`): extracted `llm/prompts.py`, `llm/client.py`, `rag/service.py`, `rag/retriever.py`. Implemented deferral guard, JSON output contract (retry-once + deferral fallback), full citation metadata (frontmatter extraction in ingest.py), section-aware chunking (MarkdownHeaderTextSplitter), BAAI/bge-small-en, CHROMA_PATH env var. Wrote 15 unit tests (TDD — tests written first, all green). Refactored app.py to delegate to rag.service. Added pytest + pyyaml + langchain-text-splitters to requirements.txt. |
