@@ -13,184 +13,161 @@ DEMO_MODE = os.getenv("HOOT_DEMO", "").lower() in ("1", "true", "yes")
 
 _CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ── Reset & base ── */
 html, body, [class*="css"] {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px !important;
 }
 #MainMenu, footer, header { visibility: hidden; }
 .stDeployButton { display: none !important; }
 
 /* ── Page background ── */
-.stApp { background: #F7F7F8; }
-
-/* ── Hide default title/caption ── */
-.hoot-hidden { display: none; }
+.stApp { background: #F0F2F5; }
 
 /* ── Top navbar ── */
 .hoot-nav {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 52px;
+    height: 62px;
     background: #fff;
-    border-bottom: 1px solid #E5E5E5;
+    border-bottom: 1.5px solid #E8E8E8;
     display: flex;
     align-items: center;
-    padding: 0 24px;
-    gap: 10px;
+    padding: 0 32px;
+    gap: 12px;
     z-index: 999;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
 }
-.hoot-nav-logo { font-size: 1.35rem; }
+.hoot-nav-logo { font-size: 1.8rem; }
 .hoot-nav-name {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 1.2rem;
+    font-weight: 800;
     color: #1A1A1A;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 .hoot-nav-badge {
-    font-size: 0.65rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 700;
     background: #9D2235;
     color: white;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 20px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 .hoot-nav-disclaimer {
     margin-left: auto;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     color: #999;
+    font-weight: 400;
 }
 
 /* ── Push content below navbar ── */
 .main .block-container {
-    padding-top: 72px !important;
-    padding-bottom: 100px !important;
-    max-width: 780px !important;
+    padding-top: 82px !important;
+    padding-bottom: 110px !important;
+    max-width: 820px !important;
 }
 
 /* ── Empty state ── */
 .hoot-welcome {
     text-align: center;
-    padding: 48px 24px 32px;
+    padding: 56px 24px 36px;
 }
-.hoot-welcome-owl { font-size: 3.5rem; margin-bottom: 12px; }
+.hoot-welcome-owl { font-size: 5rem; margin-bottom: 16px; }
 .hoot-welcome h2 {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 800;
     color: #1A1A1A;
-    margin: 0 0 8px;
-    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+    letter-spacing: -0.03em;
 }
 .hoot-welcome p {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     color: #666;
-    margin: 0 0 32px;
+    margin: 0 0 40px;
+    line-height: 1.6;
 }
-.hoot-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    max-width: 580px;
-    margin: 0 auto;
-}
-.hoot-card {
-    background: white;
-    border: 1px solid #E5E5E5;
-    border-radius: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-.hoot-card:hover {
-    border-color: #9D2235;
-    box-shadow: 0 2px 12px rgba(157,34,53,0.10);
-}
-.hoot-card-icon { font-size: 1.2rem; margin-bottom: 6px; }
-.hoot-card-text { font-size: 0.82rem; color: #333; line-height: 1.4; font-weight: 500; }
 
 /* ── Example card buttons ── */
 [data-testid="stMain"] .stButton > button {
     background: white !important;
-    border: 1px solid #E5E5E5 !important;
-    border-radius: 12px !important;
-    padding: 14px 16px !important;
+    border: 1.5px solid #E5E5E5 !important;
+    border-radius: 14px !important;
+    padding: 18px 20px !important;
     text-align: left !important;
     height: auto !important;
     min-height: unset !important;
     white-space: normal !important;
-    line-height: 1.45 !important;
-    font-size: 0.83rem !important;
-    color: #333 !important;
+    line-height: 1.5 !important;
+    font-size: 0.95rem !important;
+    color: #2C2C2C !important;
     font-weight: 500 !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
     transition: all 0.15s !important;
     width: 100% !important;
 }
 [data-testid="stMain"] .stButton > button:hover {
     border-color: #9D2235 !important;
-    box-shadow: 0 2px 12px rgba(157,34,53,0.10) !important;
+    box-shadow: 0 4px 16px rgba(157,34,53,0.12) !important;
     color: #9D2235 !important;
+    transform: translateY(-1px) !important;
 }
 
 /* ── Chat messages ── */
 [data-testid="stChatMessage"] {
     background: transparent !important;
-    padding: 4px 0 !important;
-}
-[data-testid="stChatMessage"][data-testid*="user"] > div {
-    background: #9D2235 !important;
-    color: white !important;
-    border-radius: 18px 18px 4px 18px !important;
+    padding: 6px 0 !important;
 }
 
 /* ── Assistant bubble ── */
 .stChatMessage:has([data-testid="chatAvatarIcon-assistant"]) {
     background: white !important;
-    border: 1px solid #EBEBEB !important;
+    border: 1.5px solid #EBEBEB !important;
     border-radius: 4px 18px 18px 18px !important;
-    padding: 16px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+    padding: 20px 22px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07) !important;
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
 }
 
 /* ── Citation cards ── */
 .cit-wrap {
-    margin-top: 12px;
-    border-top: 1px solid #F0F0F0;
-    padding-top: 10px;
+    margin-top: 16px;
+    border-top: 1.5px solid #F0F0F0;
+    padding-top: 12px;
 }
 .cit-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #AAA;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 .cit-card {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    background: #FAFAFA;
-    border: 1px solid #EBEBEB;
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
+    gap: 12px;
+    background: #F8F8F8;
+    border: 1.5px solid #EBEBEB;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
     text-decoration: none;
 }
 .cit-dot {
-    width: 8px; height: 8px;
+    width: 10px; height: 10px;
     border-radius: 50%;
     background: #9D2235;
-    margin-top: 4px;
+    margin-top: 5px;
     flex-shrink: 0;
 }
 .cit-body { flex: 1; min-width: 0; }
 .cit-title {
-    font-size: 0.84rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #1A1A1A;
     text-decoration: none;
@@ -216,13 +193,22 @@ html, body, [class*="css"] {
 
 /* ── Chat input ── */
 [data-testid="stChatInput"] {
-    border-radius: 14px !important;
-    border: 1.5px solid #E5E5E5 !important;
+    border-radius: 16px !important;
+    border: 1.5px solid #E0E0E0 !important;
     background: white !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.09) !important;
+    font-size: 1rem !important;
+    padding: 14px 18px !important;
 }
 [data-testid="stChatInput"]:focus-within {
     border-color: #9D2235 !important;
+    box-shadow: 0 4px 20px rgba(157,34,53,0.12) !important;
+}
+
+/* ── Chat input text ── */
+[data-testid="stChatInput"] textarea {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
 }
 
 /* ── Spinner ── */
@@ -231,13 +217,28 @@ html, body, [class*="css"] {
 /* ── Demo banner ── */
 .demo-banner {
     background: #FFF8E1;
-    border: 1px solid #FFD54F;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.78rem;
+    border: 1.5px solid #FFD54F;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
     color: #7A5700;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     text-align: center;
+}
+
+/* ── Citation meta & badge ── */
+.cit-meta { font-size: 0.82rem; color: #999; margin-top: 4px; }
+.cit-badge {
+    display: inline-block;
+    background: #F0F0F0;
+    color: #555;
+    padding: 2px 9px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 6px;
 }
 </style>
 """
